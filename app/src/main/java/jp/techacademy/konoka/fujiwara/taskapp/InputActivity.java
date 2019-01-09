@@ -1,7 +1,9 @@
 package jp.techacademy.konoka.fujiwara.taskapp;
 
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -36,7 +38,7 @@ public class InputActivity extends AppCompatActivity {
                             mYear = year;
                             mMonth = monthOfYear;
                             mDay = dayOfMonth;
-                            String dateString = mYear + "/" + String.format("%02d",(mMonth + 1)) + "/" + String.format("%02d", mDay);
+                            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1)) + "/" + String.format("%02d", mDay);
                             mDateButton.setText(dateString);
                         }
                     }, mYear, mMonth, mDay);
@@ -82,13 +84,13 @@ public class InputActivity extends AppCompatActivity {
         }
 
         // UI部品の設定
-        mDateButton = (Button)findViewById(R.id.date_button);
+        mDateButton = (Button) findViewById(R.id.date_button);
         mDateButton.setOnClickListener(mOnDateClickListener);
-        mTimeButton = (Button)findViewById(R.id.times_button);
+        mTimeButton = (Button) findViewById(R.id.times_button);
         mTimeButton.setOnClickListener(mOnTimeClickListener);
         findViewById(R.id.done_button).setOnClickListener(mOnDoneClickListener);
-        mTitleEdit = (EditText)findViewById(R.id.title_edit_text);
-        mContentEdit = (EditText)findViewById(R.id.content_edit_text);
+        mTitleEdit = (EditText) findViewById(R.id.title_edit_text);
+        mContentEdit = (EditText) findViewById(R.id.content_edit_text);
 
         // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
         Intent intent = getIntent();
@@ -118,7 +120,7 @@ public class InputActivity extends AppCompatActivity {
             mHour = calendar.get(Calendar.HOUR_OF_DAY);
             mMinute = calendar.get(Calendar.MINUTE);
 
-            String dateString = mYear + "/" + String.format("%02d",(mMonth + 1)) + "/" + String.format("%02d", mDay);
+            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1)) + "/" + String.format("%02d", mDay);
             String timeString = String.format("%02d", mHour) + ":" + String.format("%02d", mMinute);
             mDateButton.setText(dateString);
             mTimeButton.setText(timeString);
@@ -150,7 +152,7 @@ public class InputActivity extends AppCompatActivity {
 
         mTask.setTitle(title);
         mTask.setContents(content);
-        GregorianCalendar calendar = new GregorianCalendar(mYear,mMonth,mDay,mHour,mMinute);
+        GregorianCalendar calendar = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute);
         Date date = calendar.getTime();
         mTask.setDate(date);
 
@@ -158,5 +160,17 @@ public class InputActivity extends AppCompatActivity {
         realm.commitTransaction();
 
         realm.close();
+
+        Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
+        resultIntent.putExtra(MainActivity.EXTRA_TASK, mTask.getId());
+        PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+                this,
+                mTask.getId(),
+                resultIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT
+        );
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), resultPendingIntent);
     }
 }

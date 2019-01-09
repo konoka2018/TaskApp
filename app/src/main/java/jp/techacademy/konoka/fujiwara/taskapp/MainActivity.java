@@ -1,5 +1,7 @@
 package jp.techacademy.konoka.fujiwara.taskapp;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,6 +11,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import io.realm.Realm;
 import io.realm.RealmChangeListener;
@@ -88,6 +93,17 @@ public class MainActivity extends AppCompatActivity {
                         results.deleteAllFromRealm();
                         mRealm.commitTransaction();
 
+                        Intent resultIntent = new Intent(getApplicationContext(), TaskAlarmReceiver.class);
+                        PendingIntent resultPendingIntent = PendingIntent.getBroadcast(
+                                MainActivity.this,
+                                task.getId(),
+                                resultIntent,
+                                PendingIntent.FLAG_UPDATE_CURRENT
+                        );
+
+                        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+                        alarmManager.cancel(resultPendingIntent);
+
                         reloadListView();
                     }
                 });
@@ -113,11 +129,12 @@ public class MainActivity extends AppCompatActivity {
         // 表示を更新するために、アダプターにデータが変更されたことを知らせる
         mTaskAdapter.notifyDataSetChanged();
     }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        mRealm.close();
-    }
 }
+
+
+
+/*LISTとアダプターの仕組みをメインアクティビティに反映させる。
+
+
+
+*/

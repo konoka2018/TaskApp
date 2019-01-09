@@ -2,11 +2,9 @@ package jp.techacademy.konoka.fujiwara.taskapp;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 //プライマリーキーとは主キーとも呼ばれ、データーベースの一つのテーブルの中でデータを唯一的に確かめるための値
-
 
 //Serializableとはデータを丸ごとファイルに保存したり、
 //TaskAppでいうと別のActivityに渡すことができるようにすることです。
@@ -49,6 +47,5 @@ public class Task extends RealmObject implements Serializable {
 
     public void setId(int id) {
         this.id = id;
-        toString()
     }
 }

@@ -14,7 +14,7 @@ import java.util.Locale;
 
 
 /*BaseAdapterクラスを継承したTaskAdapterクラスを実装。
-  BaseAdapterを継承した時には実装しないといけないメゾットが4つあります。
+  ListViewに表示させるのに必要な関数を4つ作ります。
 ---------------------------------------------------------------------------*/
 public class TaskAdapter extends BaseAdapter {
     private LayoutInflater mLayoutInflater = null;
@@ -47,7 +47,8 @@ public class TaskAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = mLayoutInflater.inflate(android.R.layout.simple_list_item_2, null);
+            convertView = mLayoutInflater.inflate(android.R.layout.simple_list_item_2,
+                    null);
         }
 
         TextView textView1 = (TextView) convertView.findViewById(android.R.id.text1);
@@ -63,3 +64,14 @@ public class TaskAdapter extends BaseAdapter {
         return convertView;
     }
 }
+
+/*LISTとアダプターの仕組み
+
+・LISTは実際に画面に表される時には表示される直前に構築される。
+・getView関数を使って表示される直前の内容を構築する。
+・mLayoutInflaterで既に表示すみかどうか判断する。
+・convertViewが今まさに表示しようとしてるもの。
+・もしconvertViewがなければ（NULL）convertView = mLayoutInflater.inflate(android.R.layout
+　.simple_list_item_2,null);を使って最新のレイアウトを作成する。
+
+*/
