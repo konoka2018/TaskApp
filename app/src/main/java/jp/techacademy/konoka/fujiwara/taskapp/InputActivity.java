@@ -1,6 +1,5 @@
 package jp.techacademy.konoka.fujiwara.taskapp;
 
-
 import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.PendingIntent;
@@ -24,21 +23,28 @@ import io.realm.RealmResults;
 
 public class InputActivity extends AppCompatActivity {
 
+
     private int mYear, mMonth, mDay, mHour, mMinute;
     private Button mDateButton, mTimeButton;
-    private EditText mTitleEdit, mContentEdit;
+    private EditText mTitleEdit, mContentEdit, mCategoryText; // ＊＊＊＊＊新規追加＊＊＊＊＊
     private Task mTask;
+
+
+    /*時間を入力する為の記述
+   -----------------------------------------------------------------------------------------------*/
     private View.OnClickListener mOnDateClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             DatePickerDialog datePickerDialog = new DatePickerDialog(InputActivity.this,
                     new DatePickerDialog.OnDateSetListener() {
                         @Override
-                        public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                        public void onDateSet(DatePicker view, int year, int monthOfYear, int
+                                dayOfMonth) {
                             mYear = year;
                             mMonth = monthOfYear;
                             mDay = dayOfMonth;
-                            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1)) + "/" + String.format("%02d", mDay);
+                            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1))
+                                    + "/" + String.format("%02d", mDay);
                             mDateButton.setText(dateString);
                         }
                     }, mYear, mMonth, mDay);
@@ -55,7 +61,8 @@ public class InputActivity extends AppCompatActivity {
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                             mHour = hourOfDay;
                             mMinute = minute;
-                            String timeString = String.format("%02d", mHour) + ":" + String.format("%02d", mMinute);
+                            String timeString = String.format("%02d", mHour) + ":" + String.format
+                                    ("%02d", mMinute);
                             mTimeButton.setText(timeString);
                         }
                     }, mHour, mMinute, false);
@@ -70,20 +77,29 @@ public class InputActivity extends AppCompatActivity {
             finish();
         }
     };
+    /*時間を入力する為の記述終わり
+   -----------------------------------------------------------------------------------------------*/
 
+
+    /*オンクリエイト　ここから
+   -----------------------------------------------------------------------------------------------*/
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_input);
 
-        // ActionBarを設定する
+
+         /* ActionBarの設定
+   　　　------------------------------------------------------------------------------------------*/
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        // UI部品の設定
+
+         /* UI部品の設定　IDの取得
+   　　　------------------------------------------------------------------------------------------*/
         mDateButton = (Button) findViewById(R.id.date_button);
         mDateButton.setOnClickListener(mOnDateClickListener);
         mTimeButton = (Button) findViewById(R.id.times_button);
@@ -91,8 +107,12 @@ public class InputActivity extends AppCompatActivity {
         findViewById(R.id.done_button).setOnClickListener(mOnDoneClickListener);
         mTitleEdit = (EditText) findViewById(R.id.title_edit_text);
         mContentEdit = (EditText) findViewById(R.id.content_edit_text);
+        mCategoryText = (EditText) findViewById(R.id.category_text);   // ＊＊＊＊＊新規追加＊＊＊＊＊
 
-        // EXTRA_TASK から Task の id を取得して、 id から Task のインスタンスを取得する
+
+
+         /* EXTRA_TASK からTaskのidを取得して、 idからTaskのインスタンスを取得する
+   　　　------------------------------------------------------------------------------------------*/
         Intent intent = getIntent();
         int taskId = intent.getIntExtra(MainActivity.EXTRA_TASK, -1);
         Realm realm = Realm.getDefaultInstance();
@@ -111,6 +131,7 @@ public class InputActivity extends AppCompatActivity {
             // 更新の場合
             mTitleEdit.setText(mTask.getTitle());
             mContentEdit.setText(mTask.getContents());
+            mCategoryText.setText(mTask.getCategory());  // ＊＊＊＊＊新規追加＊＊＊＊＊
 
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(mTask.getDate());
@@ -120,7 +141,8 @@ public class InputActivity extends AppCompatActivity {
             mHour = calendar.get(Calendar.HOUR_OF_DAY);
             mMinute = calendar.get(Calendar.MINUTE);
 
-            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1)) + "/" + String.format("%02d", mDay);
+            String dateString = mYear + "/" + String.format("%02d", (mMonth + 1)) + "/" +
+                    String.format("%02d", mDay);
             String timeString = String.format("%02d", mHour) + ":" + String.format("%02d", mMinute);
             mDateButton.setText(dateString);
             mTimeButton.setText(timeString);
@@ -149,8 +171,10 @@ public class InputActivity extends AppCompatActivity {
 
         String title = mTitleEdit.getText().toString();
         String content = mContentEdit.getText().toString();
+        String category = mCategoryText.getText().toString();  // ＊＊＊＊＊新規追加＊＊＊＊＊
 
         mTask.setTitle(title);
+        mTask.setCategory(category);   // ＊＊＊＊＊新規追加＊＊＊＊＊
         mTask.setContents(content);
         GregorianCalendar calendar = new GregorianCalendar(mYear, mMonth, mDay, mHour, mMinute);
         Date date = calendar.getTime();
