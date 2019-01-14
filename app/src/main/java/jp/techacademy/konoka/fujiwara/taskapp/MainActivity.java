@@ -8,6 +8,11 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -16,6 +21,7 @@ import io.realm.Realm;
 import io.realm.RealmChangeListener;
 import io.realm.RealmResults;
 import io.realm.Sort;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
     };
     private ListView mListView;
     private TaskAdapter mTaskAdapter;
+
 
 
     /*オンクリエイトここからスタート
@@ -157,5 +164,39 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         mRealm.close();
+    }
+
+     /*検索バーの設定
+    ---------------------------------------------------------------------------*/
+    SearchView mSearchView = null;
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_search, menu);
+        MenuItem menuItem = menu.findItem(R.id.toolbar_menu_search);
+
+        // SearchViewの利用設定
+        mSearchView = (SearchView) menuItem.getActionView();
+        mSearchView.setIconifiedByDefault(true);
+        mSearchView.setSubmitButtonEnabled(false);
+        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                // 文字列が入力されていたら検索を実行する
+                Log.d("debug", newText);
+                RealmResults<Task> taskRealmResults = mRealm.where(Task.class).equalTo
+                        ("category", newText).findAll();
+
+                mTaskAdapter.setTaskList(mRealm.copyFromRealm(taskRealmResults));
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String newText) {
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
     }
 }
